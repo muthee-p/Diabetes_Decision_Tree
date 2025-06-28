@@ -1,9 +1,8 @@
 import streamlit as st
-import joblib
+import cloudpickle
 import pandas as pd
 import numpy as np
 
-# Set page config
 st.set_page_config(
     page_title="Diabetes Prediction App",
     page_icon="🩺",
@@ -11,15 +10,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load the trained pipeline and feature names
 @st.cache_resource
 def load_model():
     try:
-        pipeline = joblib.load('diabetes_pipeline.pkl')
-        feature_names = joblib.load('feature_names.pkl')
+        with open("diabetes_pipeline.pkl", "rb") as f:
+            pipeline = cloudpickle.load(f)
+        with open("feature_names.pkl", "rb") as f:
+            feature_names = cloudpickle.load(f)
         return pipeline, feature_names
-    except FileNotFoundError:
-        st.error("Model files not found. Please make sure 'diabetes_pipeline.pkl' and 'feature_names.pkl' are in the app directory.")
+    except Exception as e:
+        st.error(f" Failed to load model: {e}")
         return None, None
 
 # Load model
